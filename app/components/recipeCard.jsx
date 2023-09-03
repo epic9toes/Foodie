@@ -7,7 +7,7 @@ import {
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { CachedImage } from "../helpers/image";
 
-export default function RecipeCard({ item, index }) {
+export default function RecipeCard({ item, index, navigation }) {
   const isEven = index % 2 === 0;
   return (
     <Animated.View
@@ -17,6 +17,7 @@ export default function RecipeCard({ item, index }) {
         .damping(12)}
     >
       <Pressable
+        onPress={() => navigation.navigate("RecipeDetail", { ...item })}
         style={{
           width: "100%",
           paddingLeft: isEven ? 0 : 8,
