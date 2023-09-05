@@ -1,14 +1,14 @@
-import { View, Text, ScrollView, Image, TextInput } from "react-native";
+import { View, Text, ScrollView, Image } from "react-native";
 import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
-import { BellIcon, MagnifyingGlassIcon } from "react-native-heroicons/outline";
+import { BellIcon } from "react-native-heroicons/outline";
 import Categories from "../components/categories";
 import axios from "axios";
 import Recipes from "../components/recipes";
+import Search from "../components/search";
+import { globalHeight, URL_API } from "../constants";
+import HeaderHome from "../components/headerHome";
+
 export default function HomeScreen() {
   const [activeCategory, setActiveCategory] = useState("Beef");
   const [categories, setCategories] = useState([]);
@@ -20,9 +20,7 @@ export default function HomeScreen() {
 
   const getCategories = async () => {
     try {
-      const res = await axios.get(
-        "https://themealdb.com/api/json/v1/1/categories.php"
-      );
+      const res = await axios.get(`${URL_API}categories.php`);
       if (res && res.data) {
         setCategories(res.data.categories);
       }
@@ -33,9 +31,7 @@ export default function HomeScreen() {
 
   const getRecipes = async (category = "Beef") => {
     try {
-      const res = await axios.get(
-        `https://themealdb.com/api/json/v1/1/filter.php?c=${category}`
-      );
+      const res = await axios.get(`${URL_API}filter.php?c=${category}`);
       if (res && res.data) {
         setRecipes(res.data.meals);
       }
@@ -62,47 +58,19 @@ export default function HomeScreen() {
         <View className="flex-row items-center justify-between mx-4 mb-2 ">
           <Image
             source={require(`../assets/images/avatar.png`)}
-            style={{ width: hp(5), height: hp(5) }}
+            style={{ width: globalHeight(5), height: globalHeight(5) }}
           />
-          <BellIcon size={hp(4)} color="gray" />
+          <BellIcon size={globalHeight(4)} color="gray" />
         </View>
 
         {/* greetings and motto */}
-        <View className="mx-4 mb-2 space-y-2">
-          <Text className="text-neutral-600" style={{ fontSize: hp(1.7) }}>
-            Hello, Sunny
-          </Text>
-          <View>
-            <Text
-              className="font-semibold text-neutral-600"
-              style={{ fontSize: hp(3.6) }}
-            >
-              Try dey cook your own
-            </Text>
-          </View>
-          <Text
-            className="font-semibold text-neutral-600"
-            style={{ fontSize: hp(3.6) }}
-          >
-            food for <Text className="text-red-500">house</Text>
-          </Text>
+        <View>
+          <HeaderHome />
         </View>
 
         {/* Search bar */}
-        <View className="mx-4 flex-row  items-center rounded-full bg-black/5 p-[6px]">
-          <TextInput
-            placeholder="Search any recipe"
-            placeholderTextColor={"gray"}
-            style={{ fontSize: hp(1.7) }}
-            className="flex-1 pl-3 mb-1 text-base tracking-wider"
-          />
-          <View className="p-3 bg-white rounded-full ">
-            <MagnifyingGlassIcon
-              size={hp(2.5)}
-              strokeWidth={3}
-              color={"gray"}
-            />
-          </View>
+        <View>
+          <Search />
         </View>
 
         {/* category section */}

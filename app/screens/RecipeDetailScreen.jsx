@@ -17,6 +17,7 @@ import axios from "axios";
 import Loading from "../components/loading";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import YoutubeIframe from "react-native-youtube-iframe";
+import { URL_API } from "../constants";
 
 export default function RecipeDetailScreen(props) {
   const navigation = useNavigation();
@@ -27,9 +28,7 @@ export default function RecipeDetailScreen(props) {
 
   const getRecipeDetail = async (id) => {
     try {
-      const res = await axios.get(
-        `https://themealdb.com/api/json/v1/1/lookup.php?i=${id}`
-      );
+      const res = await axios.get(`${URL_API}lookup.php?i=${id}`);
 
       if (res?.data) {
         setMealData(res.data.meals[0]);
