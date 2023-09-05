@@ -1,7 +1,6 @@
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { CachedImage } from "../helpers/image";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -16,6 +15,8 @@ import { HeartIcon, Square3Stack3DIcon } from "react-native-heroicons/solid";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import Loading from "../components/loading";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import YoutubeIframe from "react-native-youtube-iframe";
 
 export default function RecipeDetailScreen(props) {
   const navigation = useNavigation();
@@ -30,13 +31,7 @@ export default function RecipeDetailScreen(props) {
         `https://themealdb.com/api/json/v1/1/lookup.php?i=${id}`
       );
 
-      if (res && res.data) {
-        // const filteredArray = res.data.meals.filter((obj) => {
-        //   return Object.keys(obj).some((key) => {
-        //     const value = obj[key];
-        //     return value !== "" && value !== null;
-        //   });
-        // });
+      if (res?.data) {
         setMealData(res.data.meals[0]);
         setLoading(false);
       }
@@ -57,6 +52,15 @@ export default function RecipeDetailScreen(props) {
     return indexes;
   };
 
+  const getYoutubeVideoId = (url) => {
+    const regex = /[?&]v=([^&]+)/;
+    const match = url.match(regex);
+    if (match && match[1]) {
+      return match[1];
+    }
+    return null;
+  };
+
   useEffect(() => {
     getRecipeDetail(item.idMeal);
   }, []);
@@ -71,8 +75,9 @@ export default function RecipeDetailScreen(props) {
 
       {/* recipe image */}
       <View className="flex-row justify-center">
-        <CachedImage
-          uri={item.strMealThumb}
+        <Animated.Image
+          defaultSource={require("../assets/images/food.png")}
+          source={{ uri: item.strMealThumb }}
           style={{
             width: wp(98),
             height: hp(50),
@@ -81,11 +86,15 @@ export default function RecipeDetailScreen(props) {
             borderBottomRightRadius: 40,
             marginTop: 4,
           }}
+          sharedTransitionTag={item.strMeal}
         />
       </View>
 
-      {/* Bcak Button */}
-      <View className="absolute flex-row items-center justify-between w-full pt-14">
+      {/* Back Button */}
+      <Animated.View
+        entering={FadeIn.delay(200).duration(1000)}
+        className="absolute flex-row items-center justify-between w-full pt-14"
+      >
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           className="p-2 ml-5 bg-white rounded-full"
@@ -103,7 +112,7 @@ export default function RecipeDetailScreen(props) {
             color={isFav ? "red" : "gray"}
           />
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
       {/* meal description  */}
       {loading ? (
@@ -111,7 +120,10 @@ export default function RecipeDetailScreen(props) {
       ) : (
         <View className="justify-between px-4 pt-8 space-y-4">
           {/* name and area */}
-          <View className="space-y-2">
+          <Animated.View
+            entering={FadeInDown.duration(700).springify().damping(12)}
+            className="space-y-2"
+          >
             <Text
               className="flex-1 font-bold text-neutral-600"
               style={{ fontSize: hp(3) }}
@@ -125,10 +137,16 @@ export default function RecipeDetailScreen(props) {
             >
               {mealData?.strArea}
             </Text>
-          </View>
+          </Animated.View>
 
           {/* misc */}
-          <View className="flex-row justify-around">
+          <Animated.View
+            entering={FadeInDown.delay(100)
+              .duration(700)
+              .springify()
+              .damping(12)}
+            className="flex-row justify-around"
+          >
             {/* Cooking time */}
             <View className="flex p-2 bg-red-300 rounded-full">
               <View
@@ -232,10 +250,16 @@ export default function RecipeDetailScreen(props) {
                 </Text>
               </View>
             </View>
-          </View>
+          </Animated.View>
 
           {/* ingredients  */}
-          <View className="space-y-4">
+          <Animated.View
+            entering={FadeInDown.delay(200)
+              .duration(700)
+              .springify()
+              .damping(12)}
+            className="space-y-4"
+          >
             <Text
               className="flex-1 font-bold text-neutral-700 "
               style={{ fontSize: hp(2.5) }}
@@ -268,10 +292,16 @@ export default function RecipeDetailScreen(props) {
                 );
               })}
             </View>
-          </View>
+          </Animated.View>
 
           {/* Instructions  */}
-          <View className="space-y-4">
+          <Animated.View
+            entering={FadeInDown.delay(300)
+              .duration(700)
+              .springify()
+              .damping(12)}
+            className="space-y-4"
+          >
             <Text
               className="flex-1 font-bold text-neutral-700 "
               style={{ fontSize: hp(2.5) }}
@@ -281,19 +311,30 @@ export default function RecipeDetailScreen(props) {
             <Text className="text-neutral-700" style={{ fontSize: hp(1.6) }}>
               {mealData?.strInstructions}
             </Text>
-          </View>
+          </Animated.View>
 
           {/* Recipe Video */}
           {mealData.strYoutube && (
-            <View className="space-y-4">
+            <Animated.View
+              entering={FadeInDown.delay(400)
+                .duration(700)
+                .springify()
+                .damping(12)}
+              className="space-y-4"
+            >
               <Text
                 style={{ fontSize: hp(2.5) }}
                 className="flex-1 font-bold text-neutral-700"
               >
                 Recipe Video
               </Text>
-              <View></View>
-            </View>
+              <View>
+                <YoutubeIframe
+                  videoId={getYoutubeVideoId(mealData?.strYoutube)}
+                  height={hp(30)}
+                />
+              </View>
+            </Animated.View>
           )}
         </View>
       )}
