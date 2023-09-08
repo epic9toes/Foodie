@@ -8,8 +8,14 @@ import MasonryList from "@react-native-seoul/masonry-list";
 import RecipeCard from "./recipeCard";
 import Loading from "./loading";
 import { useNavigation } from "@react-navigation/native";
+import { RootStackNavigationProp, category } from "../navigation/types";
 
-export default function Recipes({ categories, recipes }) {
+interface RecipesProps {
+  categories: category[];
+  recipes: object[];
+}
+
+const Recipes: React.FC<RecipesProps> = ({ categories, recipes }) => {
   const navigation = useNavigation();
 
   return (
@@ -33,12 +39,11 @@ export default function Recipes({ categories, recipes }) {
               <RecipeCard navigation={navigation} item={item} index={i} />
             )}
             onEndReachedThreshold={0.1}
-            //   refreshing={isLoadingNext}
-            //   onRefresh={() => refetch({ first: ITEM_CNT })}
-            //   onEndReached={() => loadNext(ITEM_CNT)}
           />
         </View>
       )}
     </View>
   );
-}
+};
+
+export default Recipes;

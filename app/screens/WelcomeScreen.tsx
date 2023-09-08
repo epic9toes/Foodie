@@ -1,25 +1,33 @@
 import { View, Text, Image } from "react-native";
 import React, { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
 import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
-import { useNavigation } from "@react-navigation/native";
+import { globalHeight } from "../constants";
+import { RootStackNavigationProp } from "../navigation/types";
 
-export default function WelcomeScreen() {
+type WelcomeScreenProps = {
+  navigation: RootStackNavigationProp<"Home">;
+};
+
+const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
   const ring1padding = useSharedValue(0);
   const ring2padding = useSharedValue(0);
-  const navigation = useNavigation();
+
   useEffect(() => {
     ring1padding.value = 0;
     ring2padding.value = 0;
     setTimeout(
-      () => (ring1padding.value = withSpring(ring1padding.value + hp(5), 100))
+      () =>
+        (ring1padding.value = withSpring(ring1padding.value + globalHeight(5), {
+          stiffness: 100,
+        }))
     );
     setTimeout(
-      () => (ring2padding.value = withSpring(ring1padding.value + hp(5.5), 300))
+      () =>
+        (ring2padding.value = withSpring(
+          ring1padding.value + globalHeight(5.5),
+          { stiffness: 300 }
+        ))
     );
     setTimeout(() => navigation.navigate("Home"), 2500);
   }, []);
@@ -38,7 +46,7 @@ export default function WelcomeScreen() {
         >
           <Image
             source={require(`../assets/images/welcome.jpg`)}
-            style={{ width: hp(20), height: hp(20) }}
+            style={{ width: globalHeight(20), height: globalHeight(20) }}
             className="rounded-full"
           />
         </Animated.View>
@@ -47,13 +55,13 @@ export default function WelcomeScreen() {
       {/* caption with motto */}
       <View className="flex items-center space-y-2">
         <Text
-          style={{ fontSize: hp(7) }}
+          style={{ fontSize: globalHeight(7) }}
           className="font-bold tracking-widest text-white "
         >
           Foodie
         </Text>
         <Text
-          style={{ fontSize: hp(2) }}
+          style={{ fontSize: globalHeight(2) }}
           className="font-medium tracking-widest text-white "
         >
           Hunger no dey hear word!
@@ -61,4 +69,5 @@ export default function WelcomeScreen() {
       </View>
     </View>
   );
-}
+};
+export default WelcomeScreen;

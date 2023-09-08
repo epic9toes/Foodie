@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image } from "react-native";
+import { View, ScrollView, Image } from "react-native";
 import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { BellIcon } from "react-native-heroicons/outline";
@@ -8,11 +8,12 @@ import Recipes from "../components/recipes";
 import Search from "../components/search";
 import { globalHeight, URL_API } from "../constants";
 import HeaderHome from "../components/headerHome";
+import { ErrorHandler } from "../helpers/errorHandler";
 
-export default function HomeScreen() {
-  const [activeCategory, setActiveCategory] = useState("Beef");
-  const [categories, setCategories] = useState([]);
-  const [recipes, setRecipes] = useState([]);
+const HomeScreen = () => {
+  const [activeCategory, setActiveCategory] = useState<string>("Beef");
+  const [categories, setCategories] = useState<object[]>([]);
+  const [recipes, setRecipes] = useState<object[]>([]);
   useEffect(() => {
     getCategories();
     getRecipes();
@@ -21,26 +22,26 @@ export default function HomeScreen() {
   const getCategories = async () => {
     try {
       const res = await axios.get(`${URL_API}categories.php`);
-      if (res && res.data) {
+      if (res?.data) {
         setCategories(res.data.categories);
       }
-    } catch (error) {
-      console.log(`error: ${error.message}`);
+    } catch (error: any) {
+      console.log(ErrorHandler(error));
     }
   };
 
-  const getRecipes = async (category = "Beef") => {
+  const getRecipes = async (category: string = "Beef") => {
     try {
       const res = await axios.get(`${URL_API}filter.php?c=${category}`);
-      if (res && res.data) {
+      if (res?.data) {
         setRecipes(res.data.meals);
       }
-    } catch (error) {
-      console.log(`error: ${error.message}`);
+    } catch (error: any) {
+      console.log(ErrorHandler(error));
     }
   };
 
-  const handleChangeCategory = (category) => {
+  const handleChangeCategory = (category: string) => {
     getRecipes(category);
     setActiveCategory(category);
     setRecipes([]);
@@ -91,4 +92,6 @@ export default function HomeScreen() {
       </ScrollView>
     </View>
   );
-}
+};
+
+export default HomeScreen;

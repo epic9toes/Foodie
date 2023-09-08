@@ -1,32 +1,34 @@
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import {
-  ChevronLeftIcon,
-  ClockIcon,
-  FireIcon,
-  UsersIcon,
-} from "react-native-heroicons/outline";
-import { HeartIcon, Square3Stack3DIcon } from "react-native-heroicons/solid";
-import { useNavigation } from "@react-navigation/native";
+import { ClockIcon, FireIcon, UsersIcon } from "react-native-heroicons/outline";
+import { Square3Stack3DIcon } from "react-native-heroicons/solid";
+import { RouteProp } from "@react-navigation/native";
 import axios from "axios";
 import Loading from "../components/loading";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import YoutubeIframe from "react-native-youtube-iframe";
 import { URL_API } from "../constants";
+import { ErrorHandler } from "../helpers/errorHandler";
+import BackButton from "../components/RecipeDetailComp/backBtn";
+import { RootStackParamList } from "../navigation/types";
 
-export default function RecipeDetailScreen(props) {
-  const navigation = useNavigation();
-  let item = props.route.params;
-  const [isFav, setIsFav] = useState(false);
-  const [mealData, setMealData] = useState(null);
-  const [loading, setLoading] = useState(true);
+type RecipeDetailScreenProps = {
+  route: RouteProp<RootStackParamList, "RecipeDetail">;
+};
 
-  const getRecipeDetail = async (id) => {
+const RecipeDetailScreen: React.FC<RecipeDetailScreenProps> = ({ route }) => {
+  const item = route.params;
+  const { strMeal, strMealThumb, idMeal } = item;
+  const [isFav, setIsFav] = useState<boolean>(false);
+  const [mealData, setMealData] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const getRecipeDetail = async (id: string) => {
     try {
       const res = await axios.get(`${URL_API}lookup.php?i=${id}`);
 
@@ -34,12 +36,12 @@ export default function RecipeDetailScreen(props) {
         setMealData(res.data.meals[0]);
         setLoading(false);
       }
-    } catch (error) {
-      console.log(`error: ${error.message}`);
+    } catch (error: any) {
+      console.log(ErrorHandler(error));
     }
   };
 
-  const ingredientsIndexes = (meal) => {
+  const ingredientsIndexes = (meal: Record<string, string>) => {
     if (!meal) return [];
     let indexes = [];
     for (let i = 0; i <= 20; i++) {
@@ -51,7 +53,7 @@ export default function RecipeDetailScreen(props) {
     return indexes;
   };
 
-  const getYoutubeVideoId = (url) => {
+  const getYoutubeVideoId = (url: string) => {
     const regex = /[?&]v=([^&]+)/;
     const match = url.match(regex);
     if (match && match[1]) {
@@ -61,7 +63,7 @@ export default function RecipeDetailScreen(props) {
   };
 
   useEffect(() => {
-    getRecipeDetail(item.idMeal);
+    getRecipeDetail(idMeal);
   }, []);
 
   return (
@@ -76,7 +78,7 @@ export default function RecipeDetailScreen(props) {
       <View className="flex-row justify-center">
         <Animated.Image
           defaultSource={require("../assets/images/food.png")}
-          source={{ uri: item.strMealThumb }}
+          source={{ uri: strMealThumb }}
           style={{
             width: wp(98),
             height: hp(50),
@@ -85,33 +87,12 @@ export default function RecipeDetailScreen(props) {
             borderBottomRightRadius: 40,
             marginTop: 4,
           }}
-          sharedTransitionTag={item.strMeal}
+          sharedTransitionTag={strMeal}
         />
       </View>
 
       {/* Back Button */}
-      <Animated.View
-        entering={FadeIn.delay(200).duration(1000)}
-        className="absolute flex-row items-center justify-between w-full pt-14"
-      >
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          className="p-2 ml-5 bg-white rounded-full"
-        >
-          <ChevronLeftIcon size={hp(3.5)} strokeWidth={4.5} color={"#FF0000"} />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => setIsFav(!isFav)}
-          className="p-2 mr-5 bg-white rounded-full"
-        >
-          <HeartIcon
-            size={hp(3.5)}
-            strokeWidth={4.5}
-            color={isFav ? "red" : "gray"}
-          />
-        </TouchableOpacity>
-      </Animated.View>
+      <BackButton isFav={isFav} setIsFav={setIsFav} />
 
       {/* meal description  */}
       {loading ? (
@@ -329,7 +310,7 @@ export default function RecipeDetailScreen(props) {
               </Text>
               <View>
                 <YoutubeIframe
-                  videoId={getYoutubeVideoId(mealData?.strYoutube)}
+                  videoId={getYoutubeVideoId(mealData?.strYoutube) || ""}
                   height={hp(30)}
                 />
               </View>
@@ -339,4 +320,6 @@ export default function RecipeDetailScreen(props) {
       )}
     </ScrollView>
   );
-}
+};
+
+export default RecipeDetailScreen;
