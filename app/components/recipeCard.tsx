@@ -1,13 +1,18 @@
 import { Text, Pressable } from "react-native";
 import React from "react";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { RootStackNavigationProp, item } from "../navigation/types";
+import { globalHeight } from "../constants";
 
-export default function RecipeCard({ item, index, navigation }) {
+interface RecipeCardProps {
+  item: item;
+  index: number;
+  navigation: RootStackNavigationProp<"RecipeDetail">; // Use the specific navigation parameters type
+}
+
+const RecipeCard: React.FC<RecipeCardProps> = ({ item, index, navigation }) => {
   const isEven = index % 2 === 0;
+
   return (
     <Animated.View
       entering={FadeInDown.delay(index * 100)
@@ -27,12 +32,15 @@ export default function RecipeCard({ item, index, navigation }) {
         <Animated.Image
           defaultSource={require("../assets/images/food.png")}
           source={{ uri: item.strMealThumb }}
-          style={{ width: "100%", height: index % 3 === 0 ? hp(25) : hp(35) }}
+          style={{
+            width: "100%",
+            height: index % 3 === 0 ? globalHeight(25) : globalHeight(35),
+          }}
           className="bg-black/5 rounded-3xl"
           sharedTransitionTag={item.strMeal}
         />
         <Text
-          style={{ fontSize: hp(1.5) }}
+          style={{ fontSize: globalHeight(1.5) }}
           numberOfLines={1}
           className="ml-2 font-semibold text-neutral-600 "
         >
@@ -41,4 +49,5 @@ export default function RecipeCard({ item, index, navigation }) {
       </Pressable>
     </Animated.View>
   );
-}
+};
+export default RecipeCard;

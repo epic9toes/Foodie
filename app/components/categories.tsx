@@ -1,16 +1,20 @@
-import { View, Text, ScrollView, TouchableOpacity, Image } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import React from "react";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { globalHeight } from "../constants";
+import { category } from "../navigation/types";
 
-export default function Categories({
+interface TypeProps {
+  activeCategory: string;
+  handleChangeCategory: (val: string) => void;
+  categories: category[];
+}
+
+const Categories: React.FC<TypeProps> = ({
   activeCategory,
   handleChangeCategory,
   categories,
-}) {
+}) => {
   return (
     <Animated.View entering={FadeInDown.duration(500).springify()}>
       <ScrollView
@@ -33,13 +37,13 @@ export default function Categories({
                   <Animated.Image
                     defaultSource={require("../assets/images/food.png")}
                     source={{ uri: cat.strCategoryThumb }}
-                    style={{ width: hp(6), height: hp(6) }}
+                    style={{ width: globalHeight(6), height: globalHeight(6) }}
                     className="rounded-full"
                   />
                 </View>
                 <Text
                   className="text-neutral-600"
-                  style={{ fontSize: hp(1.6) }}
+                  style={{ fontSize: globalHeight(1.6) }}
                 >
                   {cat.strCategory}
                 </Text>
@@ -49,4 +53,5 @@ export default function Categories({
       </ScrollView>
     </Animated.View>
   );
-}
+};
+export default Categories;
